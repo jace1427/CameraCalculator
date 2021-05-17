@@ -8,6 +8,11 @@ Credits: N/A
 Build several objects that evaluate functions like plus and times over
 polish notation.
 """
+import logging
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 # One global environment (scope) for
 # the calculator
@@ -57,6 +62,7 @@ class IntConst(Expr):
 
     def eval(self) -> 'IntConst':
         """Eval of a constant integer is a constant integer."""
+        log.debug(self.__repr__())
         return self
 
     def __eq__(self, other: Expr) -> bool:
@@ -83,6 +89,7 @@ class BinOp(Expr):
 
     def eval(self) -> 'IntConst':
         """Each concrete subclass must define _apply(int, int) -> int"""
+        log.debug(self.__repr__())
         left_val = self.left.eval()
         right_val = self.right.eval()
         return IntConst(self._apply(left_val.value, right_val.value))
@@ -115,7 +122,7 @@ class Div(BinOp):
         self._binop_init(left, right, '/', 'Div')
 
     def _apply(self, left: int, right: int) -> int:
-        return left // right
+        return left / right
 
 
 class Minus(BinOp):
@@ -146,6 +153,7 @@ class Unop(Expr):
         return f'{self.op_name}({repr(self.left)})'
 
     def eval(self) -> 'IntConst':
+        log.debug(self.__repr__())
         left_val = self.left.eval()
         return IntConst(self._apply(left_val.value))
 
@@ -198,27 +206,62 @@ class Var(Expr):
         else:
             raise UndefinedVariable(
                 f'{self.name} has not been assigned a value')
+        log.debug(self.__repr__())
+        pass
 
     def assign(self, value: IntConst):
         global ENV
         ENV[self.name] = value
 
 
-class Assign(Expr):
-    """Assignment: x = E represented as Assign(x, E)."""
+class Equals(Expr):
+    """Equals: x = y represented as Equals(x, y)."""
 
-    def __init__(self, left: Var, right: Expr):
-        assert isinstance(left, Var)  # Can only assign to variables!
+    def __init__(self, left: Expr, right: Expr):
         self.left = left
         self.right = right
 
     def eval(self) -> IntConst:
-        r_val = self.right.eval()
-        self.left.assign(r_val)
-        return r_val
+        log.debug(self.__repr__())
+        if isinstance(self.left, Var):
+            log.debug("Var on left")
+            r_val = self.right.eval()
+            self.left.assign(r_val)
+            return r_val
+        elif isinstance(self.right, Var):
+            log.debug("Var on right")
+            l_val = self.left.eval()
+            self.right.assign(l_val)
+            return l_val
+        else:
+            left = self._find_var(self.left)
+            right = self._find_var(self.right)
+            if left:
+                log.debug("solving left side")
+                self._isolate("left")
+            elif right:
+                log.debug("solving right side")
+                self._isolate("right")
+            else:
+                raise NotImplementedError(
+                    "Tried to solve but couldn't find the variable")
+
+    def _find_var(self, curr: Expr):
+        if isinstance(curr, Var):
+            return True
+        if not isinstance(curr.left, IntConst):
+            if self._find_var(curr.left):
+                return True
+        if not isinstance(curr.right, IntConst):
+            if self._find_var(curr.right):
+                return True
+        return False
+
+    def _isolate(self, left_right):
+        pass
 
     def __str__(self) -> str:
         return f'{self.left} = {self.right}'
 
     def __repr__(self) -> str:
-        return f'Assign({self.left}, {self.right})'
+        return f'Equals({self.left.__repr__()}, {self.right.__repr__()})'

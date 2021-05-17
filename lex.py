@@ -32,7 +32,7 @@ from enum import Enum
 import logging
 logging.basicConfig()
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 # To the extent possible, we would like to describe
@@ -63,7 +63,7 @@ class TokenCat(Enum):
     DIV = r"/"
     NEG = r"~"
     ABS = r"@"
-    ASSIGN = r"="
+    EQUALS = r"="
     VAR = r"[a-zA-Z_][a-zA-Z_]*"
     LPAREN = r"\("
     RPAREN = r"\)"
@@ -126,7 +126,7 @@ class TokenStream(object):
         log.debug("Tokens: {}".format(self.tokens))
 
     def __str__(self) -> str:
-        return "[{}]".format("|".join(self.tokens))
+        return "[{}]".format(self.tokens.__repr__())
 
     def _check_fill(self):
         while len(self.tokens) == 0:

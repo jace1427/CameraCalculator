@@ -74,12 +74,10 @@ def _stmt(stream: TokenStream) -> expr.Expr:
     stmt ::= exp ['=' exp]
     """
     left = _expr(stream)
-    if stream.peek().kind is TokenCat.ASSIGN:
-        if not isinstance(left, expr.Var):
-            raise InputError("Can only assign to a variable")
+    if stream.peek().kind is TokenCat.EQUALS:
         stream.take()
         right = _expr(stream)
-        return expr.Assign(left, right)
+        return expr.Equals(left, right)
     else:
         return left
 
@@ -137,6 +135,7 @@ def _primary(stream: TokenStream) -> expr.Expr:
     else:
         raise InputError(f"Confused about {token} in expression")
 
+
 ###
 # Calculator
 ###
@@ -148,12 +147,12 @@ def calc(text: str):
         exp = parse(io.StringIO(text))
         print(f"{exp} => {exp.eval()}")
     except Exception as e:
-        print(f"Oops! {e}")
+        print(f"Error: {e}")
 
 
 def llcalc():
     """Interactive calculator interface."""
-    txt = "4 = x"
+    txt = "3 + (2 - 1 / 2 * 0 / 9) = 9 + 2 / 5 * 2 + ((x / 4) - 5) "
     calc(txt)
 
 
