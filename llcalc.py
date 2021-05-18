@@ -152,7 +152,7 @@ def calc(text: str):
 
 def llcalc():
     """Interactive calculator interface."""
-    txt = "3 + (2 - 1 / 2 * 0 / 9) = 9 + 2 / 5 * 2 + ((x / 4) - 5) "
+    txt = "2 / x = 5"
     calc(txt)
 
 
