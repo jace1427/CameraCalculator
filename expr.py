@@ -1,12 +1,6 @@
-"""             expr.py
-CIS 211 W19 Project 03
+"""expr.py
 
 Author: Justin Spidell
-
-Credits: N/A
-
-Build several objects that evaluate functions like plus and times over
-polish notation.
 """
 import logging
 

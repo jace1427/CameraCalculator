@@ -1,11 +1,5 @@
 """
-An LL parser for the CIS 211 calculator.
-Michal Young, spring 2018, revised winter 2019
-
-LL / recursive descent parsing is one of approach to
-parsing syntax of programming languages, including
-arithmetic expressions.   I'll describe this more
-in a separate document
+An LL parser for the calculator.
 """
 
 from lex import TokenStream, TokenCat
@@ -124,7 +118,7 @@ def _primary(stream: TokenStream) -> expr.Expr:
     token = stream.take()
     if token.kind is TokenCat.INT:
         log.debug(f"Returning Const node from token {token}")
-        return expr.IntConst(int(token.value))
+        return expr.Const(int(token.value))
     elif token.kind is TokenCat.VAR:
         log.debug(f"Variable {token.value}")
         return expr.Var(token.value)
@@ -152,7 +146,7 @@ def calc(text: str):
 
 def llcalc():
     """Interactive calculator interface."""
-    txt = "2 / x = 5"
+    txt = "2 + 4 = x"
     calc(txt)
 
 
