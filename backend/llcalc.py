@@ -9,10 +9,10 @@ from typing import TextIO
 
 import logging
 
-logging.basicConfig()
+logging.basicConfig(filename="parser.log")
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
-
+log.propagate = False
 
 class InputError(Exception):
     """Raised when we can't parse the input"""
@@ -139,7 +139,8 @@ def calc(text: str):
     """Parse and execute a single line"""
     try:
         exp = parse(io.StringIO(text))
-        print(f"{exp} => {exp.eval()}")
+#        print(f"{exp} => {exp.eval()}")
+        return str(exp.eval().value)
     except Exception as e:
         print(f"Error: {e}")
 
@@ -147,7 +148,7 @@ def calc(text: str):
 def llcalc():
     """Interactive calculator interface."""
     txt = "2 + 4 = x"
-    calc(txt)
+    x = calc(txt)
 
 
 if __name__ == "__main__":
