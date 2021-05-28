@@ -179,6 +179,32 @@ class Div(BinOp):
         return Times(left, right)
 
 
+class Raise(BinOp):
+    """(Expr)^(Expr)"""
+
+    def __init__(self, left: Expr, right: Expr):
+        self._binop_init(left, right, '^', 'Raise')
+
+    def _apply(self, left: int, right: int) -> int:
+        return left ** right
+
+    def _opp(self, left, right):
+        return Root(left, right)
+
+
+class Root(BinOp):
+    """Sqrt(Expr)"""
+
+    def __init__(self, left: Expr, right: Expr):
+        self._binop_init(left, right, '|', 'Root')
+
+    def _apply(self, left: int, right: int) -> int:
+        return left ** (1 / right)
+
+    def _opp(self, left, right):
+        return Raise(left, right)
+
+
 class Unop(Expr):
     """Abstract base class of all Unary operations."""
 

@@ -132,6 +132,62 @@ class TestTimes(unittest.TestCase):
         self.assertEqual(exp.eval(), Const(42))
 
 
+class TestRaise(unittest.TestCase):
+
+    def test_Raise_str(self):
+        exp = Raise(Const(5), Const(4))
+        self.assertEqual(str(exp), "(5 ^ 4)")
+
+    def test_nested_str(self):
+        exp = Raise(Raise(Const(4), Const(5)), Const(3))
+        self.assertEqual(str(exp), "((4 ^ 5) ^ 3)")
+
+    def test_repr_simple(self):
+        exp = Raise(Const(12), Const(13))
+        self.assertEqual(repr(exp), "Raise(Const(12), Const(13))")
+
+    def test_repr_nested(self):
+        exp = Raise(Const(7), Raise(Const(4), Const(2)))
+        self.assertEqual(repr(exp),
+                         "Raise(Const(7), Raise(Const(4), Const(2)))")
+
+    def test_simple(self):
+        exp = Raise(Const(4), Const(8))
+        self.assertEqual(exp.eval(), Const(65536))
+
+    def test_nested(self):
+        exp = Raise(Const(7), Raise(Const(2), Const(3)))
+        self.assertEqual(exp.eval(), Const(5764801))
+
+
+class TestRoot(unittest.TestCase):
+
+    def test_Root_str(self):
+        exp = Root(Const(5), Const(4))
+        self.assertEqual(str(exp), "(5 | 4)")
+
+    def test_nested_str(self):
+        exp = Root(Root(Const(4), Const(5)), Const(3))
+        self.assertEqual(str(exp), "((4 | 5) | 3)")
+
+    def test_repr_simple(self):
+        exp = Root(Const(12), Const(13))
+        self.assertEqual(repr(exp), "Root(Const(12), Const(13))")
+
+    def test_repr_nested(self):
+        exp = Root(Const(7), Root(Const(4), Const(2)))
+        self.assertEqual(repr(exp),
+                         "Root(Const(7), Root(Const(4), Const(2)))")
+
+    def test_simple(self):
+        exp = Root(Const(4), Const(8))
+        self.assertEqual(exp.eval(), Const(1.189207115002721))
+
+    def test_nested(self):
+        exp = Root(Const(7), Root(Const(2), Const(3)))
+        self.assertEqual(exp.eval(), Const(4.685487233160311))
+
+
 # #
 # # Tests of UnOp alone
 # #
@@ -220,6 +276,24 @@ class TestReverse(unittest.TestCase):
     def test_div_right(self):
         exp = Equals(Div(Const(2), Var("v")), Const(5))
         self.assertEquals(exp.eval(), Const(0.4))
+
+    def test_raise_left(self):
+        exp = Equals(Raise(Var("v"), Const(2)), Const(5))
+        self.assertEquals(exp.eval(), Const(2.23606797749979))
+
+    # TODO : implement solving: (int ^ x) = int
+    # def test_raise_right(self):
+    #     exp = Equals(Raise(Const(2), Var("v")), Const(5))
+    #     self.assertEquals(exp.eval(), Const(0.4))
+
+    def test_root_left(self):
+        exp = Equals(Root(Var("v"), Const(2)), Const(5))
+        self.assertEquals(exp.eval(), Const(25))
+
+    # TODO : implement solving: (int | x) = int
+    # def test_root_right(self):
+    #     exp = Equals(Root(Const(2), Var("v")), Const(5))
+    #     self.assertEquals(exp.eval(), Const(0.4))
 
 
 class TestSolve(unittest.TestCase):

@@ -61,6 +61,8 @@ class TokenCat(Enum):
     MINUS = r"-"
     TIMES = r"\*"
     DIV = r"/"
+    RAISE = r"\^"
+    ROOT = r"\|"
     NEG = r"~"
     ABS = r"@"
     EQUALS = r"="
@@ -199,8 +201,7 @@ def classify(word: str) -> Token:
 
 if __name__ == "__main__":
     # Simple smoke test
-    text = io.StringIO('3 4 + 5 * 7 / x =')
+    text = io.StringIO('^ |')
     tokens = TokenStream(text)
     while tokens.has_more():
         print(f"Token: {tokens.take()}")
-        input("Press enter to continue")

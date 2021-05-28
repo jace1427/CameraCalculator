@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 log.propagate = False
 
+
 class InputError(Exception):
     """Raised when we can't parse the input"""
     pass
@@ -98,17 +99,33 @@ def _expr(stream: TokenStream) -> expr.Expr:
 
 def _term(stream: TokenStream) -> expr.Expr:
     """term ::= primary { ('*'|'/')  primary }"""
-    left = _primary(stream)
+    left = _secondary(stream)
     log.debug(f"term starts with {left}")
     while stream.peek().value in ["*", "/"]:
         op = stream.take()
-        right = _primary(stream)
+        right = _secondary(stream)
         if op.value == "*":
             left = expr.Times(left, right)
         elif op.value == "/":
             left = expr.Div(left, right)
         else:
             raise InputError(f"Expecting multiplicative op, got {op}")
+    return left
+
+
+def _secondary(stream: TokenStream) -> expr.Expr:
+    """term ::= secondary { ('^'|'|')  secondary }"""
+    left = _primary(stream)
+    log.debug(f"term starts with {left}")
+    while stream.peek().value in ["^", "|"]:
+        op = stream.take()
+        right = _primary(stream)
+        if op.value == "^":
+            left = expr.Raise(left, right)
+        elif op.value == "|":
+            left = expr.Root(left, right)
+        else:
+            raise InputError(f"Expecting Exponential op, got {op}")
     return left
 
 
@@ -134,7 +151,6 @@ def _primary(stream: TokenStream) -> expr.Expr:
 # Calculator
 ###
 
-
 def calc(text: str):
     """Parse and execute a single line"""
     try:
@@ -147,8 +163,10 @@ def calc(text: str):
 
 def llcalc():
     """Interactive calculator interface."""
-    txt = "2 + 4 = x"
+    txt = "16 | 2"
     x = calc(txt)
+    input()
+    print(txt, " => ", x)
 
 
 if __name__ == "__main__":
